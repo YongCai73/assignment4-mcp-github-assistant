@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "github-workflow-assistant": {
+      "command": "/Users/joecai/Documents/New project/assignment4_mcp_github_assistant/.venv/bin/python",
+      "args": [
+        "/Users/joecai/Documents/New project/assignment4_mcp_github_assistant/server.py"
+      ]
+    }
+  }
+}
