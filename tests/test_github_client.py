@@ -42,6 +42,44 @@ def test_read_file_decodes_utf8_and_reports_truncation():
     assert request.headers["Accept"] == "application/vnd.github+json"
 
 
+def test_read_file_accepts_github_base64_with_line_breaks():
+    text = "GitHub inserts line breaks into Base64 content. " * 4
+    payload = base64.encodebytes(text.encode("utf-8")).decode("ascii")
+
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200,
+            json={
+                "type": "file",
+                "encoding": "base64",
+                "content": payload,
+                "name": "README.md",
+                "path": "README.md",
+                "sha": "abc123",
+                "size": len(text.encode("utf-8")),
+                "url": "https://api.github.com/repos/owner/repo/contents/README.md",
+                "html_url": "https://github.com/owner/repo/blob/main/README.md",
+                "git_url": "https://api.github.com/repos/owner/repo/git/blobs/abc123",
+                "download_url": "https://raw.githubusercontent.com/owner/repo/main/README.md",
+                "_links": {
+                    "self": "https://api.github.com/repos/owner/repo/contents/README.md",
+                    "git": "https://api.github.com/repos/owner/repo/git/blobs/abc123",
+                    "html": "https://github.com/owner/repo/blob/main/README.md",
+                },
+            },
+            request=request,
+        )
+    )
+    client = GitHubClient(Settings("github_pat_test"), transport=transport)
+
+    result = client.read_file(
+        "owner", "repo", "README.md", "main", max_chars=1000
+    )
+
+    assert result["content"] == text
+    assert result["truncated"] is False
+
+
 def test_read_file_url_encodes_ref_and_path_for_browser_source_url():
     payload = base64.b64encode(b"content").decode("ascii")
     transport = httpx.MockTransport(

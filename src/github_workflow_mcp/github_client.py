@@ -88,7 +88,8 @@ class GitHubClient:
         ):
             raise GitHubClientError("UNSUPPORTED_CONTENT")
         try:
-            raw_content = base64.b64decode(payload["content"], validate=True)
+            encoded_content = payload["content"].replace("\n", "").replace("\r", "")
+            raw_content = base64.b64decode(encoded_content, validate=True)
             text = raw_content.decode("utf-8")
         except (binascii.Error, UnicodeDecodeError, ValueError):
             raise GitHubClientError("UNSUPPORTED_CONTENT") from None
