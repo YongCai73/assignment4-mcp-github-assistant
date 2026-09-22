@@ -206,3 +206,25 @@ def test_unexpected_exception_is_mapped_without_details(caplog):
     assert "github_pat_never_leak" not in rendered
     assert "/Users/private" not in rendered
     assert "Traceback" not in rendered
+
+
+def test_unexpected_settings_exception_is_mapped_without_details(caplog):
+    def broken_settings_loader() -> Settings:
+        raise RuntimeError("github_pat_never_leak /Users/private Traceback")
+
+    service = GitHubWorkflowService(settings_loader=broken_settings_loader)
+
+    with caplog.at_level(logging.WARNING):
+        result = service.read_repository_file(
+            "owner",
+            "repo",
+            "README.md",
+            "main",
+            6000,
+        )
+
+    assert result["error"]["code"] == "UPSTREAM_ERROR"
+    rendered = json.dumps(result) + caplog.text
+    assert "github_pat_never_leak" not in rendered
+    assert "/Users/private" not in rendered
+    assert "Traceback" not in rendered

@@ -124,6 +124,8 @@ class GitHubWorkflowService:
             settings = self._settings_loader()
         except ConfigurationError:
             return self._configuration_error()
+        except Exception:
+            return self._upstream_error("read_repository_file")
 
         try:
             result = self._client_factory(settings).read_file(
@@ -169,6 +171,8 @@ class GitHubWorkflowService:
             settings = self._settings_loader()
         except ConfigurationError:
             return self._configuration_error()
+        except Exception:
+            return self._upstream_error("list_repository_issues")
 
         try:
             issues = self._client_factory(settings).list_issues(
