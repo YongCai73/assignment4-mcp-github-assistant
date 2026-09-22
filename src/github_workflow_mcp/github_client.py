@@ -38,7 +38,7 @@ class GitHubClient:
                 transport=self._transport,
             ) as client:
                 response = client.get(url, params=params)
-        except httpx.RequestError as exc:
+        except httpx.RequestError:
             raise GitHubClientError("UPSTREAM_ERROR") from None
 
         if not response.is_success:

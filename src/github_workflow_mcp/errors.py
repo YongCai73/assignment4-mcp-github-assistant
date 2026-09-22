@@ -25,4 +25,3 @@ class GitHubClientError(RuntimeError):
         self.code = code
         self.status = status
         super().__init__(_SAFE_CLIENT_MESSAGES.get(code, _SAFE_CLIENT_MESSAGES["UPSTREAM_ERROR"]))
-
